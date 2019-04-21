@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/top_text"
+        android:text="top"
+        android:textSize="20sp"
+        android:textColor="#FFFF"
+        android:background="#4000"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/clear_text"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_width="120dp"
+        android:layout_height="60dp" />
+
+    <TextView
+        android:id="@+id/left_text"
+        android:text="left"
+        android:textSize="20sp"
+        android:textColor="#FFFF"
+        android:background="#4000"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/top_text"
+        app:layout_constraintBottom_toTopOf="@id/bottom_text"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/random_text"
+        android:layout_width="120dp"
+        android:layout_height="60dp" />
+
+    <TextView
+        android:id="@+id/right_text"
+        android:text="right"
+        android:textSize="20sp"
+        android:textColor="#FFFF"
+        android:background="#4000"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/top_text"
+        app:layout_constraintBottom_toTopOf="@id/bottom_text"
+        app:layout_constraintLeft_toRightOf="@id/clear_text"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_width="120dp"
+        android:layout_height="60dp" />
+
+    <TextView
+        android:id="@+id/bottom_text"
+        android:text="bottom"
+        android:textSize="20sp"
+        android:textColor="#FFFF"
+        android:background="#4000"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/clear_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_width="120dp"
+        android:layout_height="60dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
