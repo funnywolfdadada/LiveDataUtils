@@ -15,6 +15,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
+/**
+ * @author funnywolf
+ * @since 2019-04-22
+ */
 public class DisplayFragment extends Fragment {
 
     private RandomNumberViewModel mViewModel;

@@ -1,24 +1,27 @@
 package com.example.mvvmdemo.viewmodels;
 
+import com.example.mvvmdemo.repositories.RandomNumberRepository;
 import com.example.mvvmdemo.repositories.StateData;
 import com.example.mvvmdemo.utils.LiveDataUtils;
-import com.example.mvvmdemo.utils.RxUtils;
-
-import java.util.concurrent.TimeUnit;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.ViewModel;
-import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
 
+/**
+ * ViewModel 层，主要处理与 View 层和 Repository(Model) 层交互，处理业务逻辑，数据请求交给 Repository 层完成
+ *
+ * @author funnywolf
+ * @since 2019-04-22
+ */
 public class RandomNumberViewModel extends ViewModel {
-    private Disposable mDisposeTop, mDisposeBottom, mDisposeLeft, mDisposeRight;
 
-    private MutableLiveData<StateData<Integer>> mTopNumberLiveData = new MutableLiveData<>();
-    private MutableLiveData<StateData<Integer>> mBottomNumberLiveData = new MutableLiveData<>();
-    private MutableLiveData<StateData<Integer>> mLeftNumberLiveData = new MutableLiveData<>();
-    private MutableLiveData<StateData<Integer>> mRightNumberLiveData = new MutableLiveData<>();
+    private boolean mUpdateAll;
+
+    private final MediatorLiveData<StateData<Integer>> mTopNumberLiveData = new MediatorLiveData<>();
+    private final MediatorLiveData<StateData<Integer>> mBottomNumberLiveData = new MediatorLiveData<>();
+    private final MediatorLiveData<StateData<Integer>> mLeftNumberLiveData = new MediatorLiveData<>();
+    private final MediatorLiveData<StateData<Integer>> mRightNumberLiveData = new MediatorLiveData<>();
 
     public LiveData<StateData<Integer>> getTopNumberLiveData() { return mTopNumberLiveData; }
 
@@ -29,83 +32,83 @@ public class RandomNumberViewModel extends ViewModel {
     public LiveData<StateData<Integer>> getRightNumberLiveData() { return mRightNumberLiveData; }
 
     public RandomNumberViewModel() {
+        mTopNumberLiveData.addSource(RandomNumberRepository.INSTANCE.getTopNumberLiveData(), data -> {
+            LiveDataUtils.update(mTopNumberLiveData, data);
+            if (data == null) {
+                mUpdateAll = false;
+                return;
+            }
+            switch (data.state) {
+                case StateData.STATE_READY:
+                    if (mUpdateAll) { updateBottom(); }
+                    break;
+                case StateData.STATE_ERROR:
+                    mUpdateAll = false;
+                    break;
+                default:
+                    break;
+            }
+        });
+        mBottomNumberLiveData.addSource(RandomNumberRepository.INSTANCE.getBottomNumberLiveData(), data -> {
+            LiveDataUtils.update(mBottomNumberLiveData, data);
+            if (data == null) {
+                mUpdateAll = false;
+                return;
+            }
+            switch (data.state) {
+                case StateData.STATE_READY:
+                    if (mUpdateAll) { updateLeft(); }
+                    break;
+                case StateData.STATE_ERROR:
+                    mUpdateAll = false;
+                    break;
+                default:
+                    break;
+            }
+        });
+        mLeftNumberLiveData.addSource(RandomNumberRepository.INSTANCE.getLeftNumberLiveData(), data -> {
+            LiveDataUtils.update(mLeftNumberLiveData, data);
+            if (data == null) {
+                mUpdateAll = false;
+                return;
+            }
+            switch (data.state) {
+                case StateData.STATE_READY:
+                    if (mUpdateAll) { updateRight(); }
+                    break;
+                case StateData.STATE_ERROR:
+                    mUpdateAll = false;
+                    break;
+                default:
+                    break;
+            }
+        });
+        mRightNumberLiveData.addSource(RandomNumberRepository.INSTANCE.getRightNumberLiveData(), data -> {
+            LiveDataUtils.update(mRightNumberLiveData, data);
+            mUpdateAll = false;
+        });
         clear();
     }
 
     public void updateAll() {
-        updateTop(true);
+        mUpdateAll = true;
+        updateTop();
     }
 
-    public void updateTop() { updateTop(false); }
-
-    public void updateTop(boolean updateAll) {
-        RxUtils.dispose(mDisposeTop);
-        LiveDataUtils.update(mTopNumberLiveData, StateData.loading());
-        mDisposeTop = Observable.timer((long) (Math.random() * 500 + 500), TimeUnit.MILLISECONDS)
-                .map(it -> {
-                    if (Math.random() > 0.2) {
-                        return (int) (Math.random() * 100);
-                    } else {
-                        throw new Exception("Something wrong!!!");
-                    }
-                })
-                .subscribe(data -> {
-                    LiveDataUtils.update(mTopNumberLiveData, StateData.ready(data));
-                    if (updateAll) { updateBottom(true); }
-                }, error -> LiveDataUtils.update(mTopNumberLiveData, StateData.error(error)));
+    public void updateTop() {
+        RandomNumberRepository.INSTANCE.updateTop();
     }
 
-    public void updateBottom() { updateBottom(false); }
-
-    public void updateBottom(boolean updateAll) {
-        RxUtils.dispose(mDisposeBottom);
-        LiveDataUtils.update(mBottomNumberLiveData, StateData.loading());
-        mDisposeBottom = Observable.timer((long) (Math.random() * 500 + 500), TimeUnit.MILLISECONDS)
-                .map(it -> {
-                    if (Math.random() > 0.2) {
-                        return (int) (Math.random() * 100);
-                    } else {
-                        throw new Exception("Something wrong!!!");
-                    }
-                })
-                .subscribe(data -> {
-                    LiveDataUtils.update(mBottomNumberLiveData, StateData.ready(data));
-                    if (updateAll) { updateLeft(true); }
-                }, error -> LiveDataUtils.update(mBottomNumberLiveData, StateData.error(error)));
+    public void updateBottom() {
+        RandomNumberRepository.INSTANCE.updateBottom();
     }
 
-    public void updateLeft() { updateLeft(false); }
-
-    public void updateLeft(boolean updateAll) {
-        RxUtils.dispose(mDisposeLeft);
-        LiveDataUtils.update(mLeftNumberLiveData, StateData.loading());
-        mDisposeLeft = Observable.timer((long) (Math.random() * 500 + 500), TimeUnit.MILLISECONDS)
-                .map(it -> {
-                    if (Math.random() > 0.2) {
-                        return (int) (Math.random() * 100);
-                    } else {
-                        throw new Exception("Something wrong!!!");
-                    }
-                })
-                .subscribe(data -> {
-                    LiveDataUtils.update(mLeftNumberLiveData, StateData.ready(data));
-                    if (updateAll) { updateRight(); }
-                }, error -> LiveDataUtils.update(mLeftNumberLiveData, StateData.error(error)));
+    public void updateLeft() {
+        RandomNumberRepository.INSTANCE.updateLeft();
     }
 
     public void updateRight() {
-        RxUtils.dispose(mDisposeRight);
-        LiveDataUtils.update(mRightNumberLiveData, StateData.loading());
-        mDisposeRight = Observable.timer((long) (Math.random() * 500 + 500), TimeUnit.MILLISECONDS)
-                .map(it -> {
-                    if (Math.random() > 0.2) {
-                        return (int) (Math.random() * 100);
-                    } else {
-                        throw new Exception("Something wrong!!!");
-                    }
-                })
-                .subscribe(data -> LiveDataUtils.update(mRightNumberLiveData, StateData.ready(data)),
-                        error -> LiveDataUtils.update(mRightNumberLiveData, StateData.error(error)));
+        RandomNumberRepository.INSTANCE.updateRight();
     }
 
     public void clear() {

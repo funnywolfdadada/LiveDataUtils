@@ -7,6 +7,10 @@ import android.os.Bundle;
 import com.example.mvvmdemo.fragment.ActionFragment;
 import com.example.mvvmdemo.fragment.DisplayFragment;
 
+/**
+ * @author funnywolf
+ * @since 2019-04-22
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override
