@@ -18,54 +18,14 @@ public class RandomNumberViewModel extends ViewModel {
 
     private boolean mUpdateAll;
 
-    private final MediatorLiveData<StateData<Integer>> mTopNumberLiveData = new MediatorLiveData<>();
-    private final MediatorLiveData<StateData<Integer>> mBottomNumberLiveData = new MediatorLiveData<>();
     private final MediatorLiveData<StateData<Integer>> mLeftNumberLiveData = new MediatorLiveData<>();
     private final MediatorLiveData<StateData<Integer>> mRightNumberLiveData = new MediatorLiveData<>();
-
-    public LiveData<StateData<Integer>> getTopNumberLiveData() { return mTopNumberLiveData; }
-
-    public LiveData<StateData<Integer>> getBottomNumberLiveData() { return mBottomNumberLiveData; }
 
     public LiveData<StateData<Integer>> getLeftNumberLiveData() { return mLeftNumberLiveData; }
 
     public LiveData<StateData<Integer>> getRightNumberLiveData() { return mRightNumberLiveData; }
 
     public RandomNumberViewModel() {
-        mTopNumberLiveData.addSource(RandomNumberRepository.INSTANCE.getTopNumberLiveData(), data -> {
-            LiveDataUtils.update(mTopNumberLiveData, data);
-            if (data == null) {
-                mUpdateAll = false;
-                return;
-            }
-            switch (data.state) {
-                case StateData.STATE_READY:
-                    if (mUpdateAll) { updateBottom(); }
-                    break;
-                case StateData.STATE_ERROR:
-                    mUpdateAll = false;
-                    break;
-                default:
-                    break;
-            }
-        });
-        mBottomNumberLiveData.addSource(RandomNumberRepository.INSTANCE.getBottomNumberLiveData(), data -> {
-            LiveDataUtils.update(mBottomNumberLiveData, data);
-            if (data == null) {
-                mUpdateAll = false;
-                return;
-            }
-            switch (data.state) {
-                case StateData.STATE_READY:
-                    if (mUpdateAll) { updateLeft(); }
-                    break;
-                case StateData.STATE_ERROR:
-                    mUpdateAll = false;
-                    break;
-                default:
-                    break;
-            }
-        });
         mLeftNumberLiveData.addSource(RandomNumberRepository.INSTANCE.getLeftNumberLiveData(), data -> {
             LiveDataUtils.update(mLeftNumberLiveData, data);
             if (data == null) {
@@ -74,7 +34,9 @@ public class RandomNumberViewModel extends ViewModel {
             }
             switch (data.state) {
                 case StateData.STATE_READY:
-                    if (mUpdateAll) { updateRight(); }
+                    if (mUpdateAll) {
+                        updateRight();
+                    }
                     break;
                 case StateData.STATE_ERROR:
                     mUpdateAll = false;
@@ -87,20 +49,11 @@ public class RandomNumberViewModel extends ViewModel {
             LiveDataUtils.update(mRightNumberLiveData, data);
             mUpdateAll = false;
         });
-        clear();
     }
 
     public void updateAll() {
         mUpdateAll = true;
-        updateTop();
-    }
-
-    public void updateTop() {
-        RandomNumberRepository.INSTANCE.updateTop();
-    }
-
-    public void updateBottom() {
-        RandomNumberRepository.INSTANCE.updateBottom();
+        updateLeft();
     }
 
     public void updateLeft() {
@@ -112,9 +65,7 @@ public class RandomNumberViewModel extends ViewModel {
     }
 
     public void clear() {
-        mTopNumberLiveData.setValue(StateData.ready(0));
-        mBottomNumberLiveData.setValue(StateData.ready(0));
-        mLeftNumberLiveData.setValue(StateData.ready(0));
-        mRightNumberLiveData.setValue(StateData.ready(0));
+        RandomNumberRepository.INSTANCE.clearLeft();
+        RandomNumberRepository.INSTANCE.clearRight();
     }
 }

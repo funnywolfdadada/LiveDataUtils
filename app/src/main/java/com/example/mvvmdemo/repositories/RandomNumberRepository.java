@@ -21,51 +21,11 @@ public enum RandomNumberRepository {
      */
     INSTANCE;
 
-    private final RxLiveData<Integer, StateData<Integer>> mTopNumberLiveData = RxLiveData.simpleStateData();
-    private final RxLiveData<Integer, StateData<Integer>> mBottomNumberLiveData = RxLiveData.simpleStateData();
     private final RxLiveData<Integer, StateData<Integer>> mLeftNumberLiveData = RxLiveData.simpleStateData();
     private final RxLiveData<Integer, StateData<Integer>> mRightNumberLiveData = RxLiveData.simpleStateData();
 
-    public LiveData<StateData<Integer>> getTopNumberLiveData() { return mTopNumberLiveData; }
-    public LiveData<StateData<Integer>> getBottomNumberLiveData() { return mBottomNumberLiveData; }
     public LiveData<StateData<Integer>> getLeftNumberLiveData() { return mLeftNumberLiveData; }
     public LiveData<StateData<Integer>> getRightNumberLiveData() { return mRightNumberLiveData; }
-
-    public void updateTop() {
-        disposeTop();
-        LiveDataUtils.update(mTopNumberLiveData, StateData.loading());
-        Observable.timer((long) (Math.random() * 500 + 500), TimeUnit.MILLISECONDS)
-                .map(it -> {
-                    if (Math.random() > 0.2) {
-                        return (int) (Math.random() * 10);
-                    } else {
-                        throw new Exception("Something wrong!!!");
-                    }
-                })
-                .subscribe(mTopNumberLiveData);
-    }
-
-    public void disposeTop() {
-        mTopNumberLiveData.dispose();
-    }
-
-    public void updateBottom() {
-        disposeBottom();
-        LiveDataUtils.update(mBottomNumberLiveData, StateData.loading());
-        Observable.timer((long) (Math.random() * 500 + 500), TimeUnit.MILLISECONDS)
-                .map(it -> {
-                    if (Math.random() > 0.2) {
-                        return (int) (Math.random() * 10 + 10);
-                    } else {
-                        throw new Exception("Something wrong!!!");
-                    }
-                })
-                .subscribe(mBottomNumberLiveData);
-    }
-
-    public void disposeBottom() {
-        mBottomNumberLiveData.dispose();
-    }
 
     public void updateLeft() {
         disposeLeft();
@@ -73,7 +33,7 @@ public enum RandomNumberRepository {
         Observable.timer((long) (Math.random() * 500 + 500), TimeUnit.MILLISECONDS)
                 .map(it -> {
                     if (Math.random() > 0.2) {
-                        return (int) (Math.random() * 10 + 20);
+                        return (int) (Math.random() * 10 + 0);
                     } else {
                         throw new Exception("Something wrong!!!");
                     }
@@ -85,13 +45,18 @@ public enum RandomNumberRepository {
         mLeftNumberLiveData.dispose();
     }
 
+    public void clearLeft() {
+        disposeLeft();
+        LiveDataUtils.update(mLeftNumberLiveData, StateData.ready(null));
+    }
+
     public void updateRight() {
         disposeRight();
         LiveDataUtils.update(mRightNumberLiveData, StateData.loading());
         Observable.timer((long) (Math.random() * 500 + 500), TimeUnit.MILLISECONDS)
                 .map(it -> {
                     if (Math.random() > 0.2) {
-                        return (int) (Math.random() * 10 + 30);
+                        return (int) (Math.random() * 10 + 10);
                     } else {
                         throw new Exception("Something wrong!!!");
                     }
@@ -103,4 +68,8 @@ public enum RandomNumberRepository {
         mRightNumberLiveData.dispose();
     }
 
+    public void clearRight() {
+        disposeRight();
+        LiveDataUtils.update(mRightNumberLiveData, StateData.ready(null));
+    }
 }

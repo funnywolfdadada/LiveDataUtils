@@ -23,8 +23,6 @@ public class DisplayFragment extends Fragment {
 
     private RandomNumberViewModel mViewModel;
 
-    private TextView mTopText;
-    private TextView mBottomText;
     private TextView mLeftText;
     private TextView mRightText;
 
@@ -32,8 +30,6 @@ public class DisplayFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.layout_fragment_display, container, false);
-        mTopText = view.findViewById(R.id.top_text);
-        mBottomText = view.findViewById(R.id.bottom_text);
         mLeftText = view.findViewById(R.id.left_text);
         mRightText = view.findViewById(R.id.right_text);
         return view;
@@ -44,13 +40,9 @@ public class DisplayFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         if (getActivity() == null) { return; }
         mViewModel = ViewModelProviders.of(getActivity()).get(RandomNumberViewModel.class);
-        mViewModel.getTopNumberLiveData().observe(this, stateData -> onDataChanged(stateData, mTopText));
-        mViewModel.getBottomNumberLiveData().observe(this, stateData -> onDataChanged(stateData, mBottomText));
         mViewModel.getLeftNumberLiveData().observe(this, stateData -> onDataChanged(stateData, mLeftText));
         mViewModel.getRightNumberLiveData().observe(this, stateData -> onDataChanged(stateData, mRightText));
 
-        mTopText.setOnClickListener(v -> mViewModel.updateTop());
-        mBottomText.setOnClickListener(v -> mViewModel.updateBottom());
         mLeftText.setOnClickListener(v -> mViewModel.updateLeft());
         mRightText.setOnClickListener(v -> mViewModel.updateRight());
     }
@@ -59,7 +51,7 @@ public class DisplayFragment extends Fragment {
         if (stateData == null || textView == null) { return; }
         switch (stateData.state) {
             case StateData.STATE_READY:
-                textView.setText(String.valueOf(stateData.data));
+                textView.setText(String.valueOf(stateData.data == null ? "" : stateData.data));
                 break;
             case StateData.STATE_ERROR:
                 textView.setText("Error");

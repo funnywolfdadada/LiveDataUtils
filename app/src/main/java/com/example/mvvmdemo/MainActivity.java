@@ -20,8 +20,8 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.top_layout, new DisplayFragment())
-                .add(R.id.bottom_layout, new ActionFragment())
+                .add(R.id.display_layout, new DisplayFragment())
+                .add(R.id.action_layout, new ActionFragment())
                 .commit();
     }
 }
