@@ -2,8 +2,10 @@ package com.example.mvvmdemo.repositories;
 
 import androidx.lifecycle.LiveData;
 
-import com.example.mvvmdemo.livedata.RxLiveData;
-import com.example.mvvmdemo.utils.LiveDataUtils;
+
+import com.funnywolf.livedatautils.LiveDataUtils;
+import com.funnywolf.livedatautils.RxLiveData;
+import com.funnywolf.livedatautils.StateData;
 
 import java.util.concurrent.TimeUnit;
 
@@ -21,8 +23,8 @@ public enum RandomNumberRepository {
      */
     INSTANCE;
 
-    private final RxLiveData<Integer, StateData<Integer>> mLeftNumberLiveData = RxLiveData.simpleStateData();
-    private final RxLiveData<Integer, StateData<Integer>> mRightNumberLiveData = RxLiveData.simpleStateData();
+    private final RxLiveData<Integer, StateData<Integer>> mLeftNumberLiveData = RxLiveData.simpleToStateData();
+    private final RxLiveData<Integer, StateData<Integer>> mRightNumberLiveData = RxLiveData.simpleToStateData();
 
     public LiveData<StateData<Integer>> getLeftNumberLiveData() { return mLeftNumberLiveData; }
     public LiveData<StateData<Integer>> getRightNumberLiveData() { return mRightNumberLiveData; }

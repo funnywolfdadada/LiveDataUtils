@@ -7,8 +7,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.mvvmdemo.R;
-import com.example.mvvmdemo.repositories.StateData;
 import com.example.mvvmdemo.viewmodels.RandomNumberViewModel;
+import com.funnywolf.livedatautils.StateData;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

@@ -1,4 +1,4 @@
-package com.example.mvvmdemo.livedata;
+package com.funnywolf.livedatautils;
 
 import android.util.Log;
 
@@ -6,12 +6,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.mvvmdemo.repositories.StateData;
-import com.example.mvvmdemo.utils.LiveDataUtils;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
+import retrofit2.Response;
 
 /**
  * 为了简化 RxJava 与 LiveData 结合时样板代码过多的问题，继承自 MutableLiveData，实现了 Disposable 和
@@ -24,8 +25,7 @@ import io.reactivex.functions.Function;
 public class RxLiveData<IN, OUT> extends MutableLiveData<OUT> implements Disposable, Observer<IN> {
     private static final String TAG = "RxLiveData";
 
-    private Disposable mDisposable;
-    private final Object mDisposableLock = new Object();
+    private final AtomicReference<Disposable> mDisposableRef = new AtomicReference<>(null);
 
     /**
      * 在 onNext 处理 IN 转 OUT 的工作
@@ -35,6 +35,16 @@ public class RxLiveData<IN, OUT> extends MutableLiveData<OUT> implements Disposa
      * 在 onError 处理 LiveData 要更新的值
      */
     private final Function<Throwable, OUT> mOnErrorMap;
+
+    /**
+     * @param onNextMap onNext 的回调处理，为空时不执行
+     * @param onErrorMap onError 的回调处理，为空时不执行
+     */
+    private RxLiveData(@Nullable Function<IN, OUT> onNextMap, @Nullable Function<Throwable, OUT> onErrorMap) {
+        super();
+        mOnNextMap = onNextMap;
+        mOnErrorMap = onErrorMap;
+    }
 
     /**
      * 订阅时需要关掉之前的订阅，然后保留新的 Disposable
@@ -65,6 +75,7 @@ public class RxLiveData<IN, OUT> extends MutableLiveData<OUT> implements Disposa
      */
     @Override
     public void onError(Throwable error) {
+        if (isDisposed()) { return; }
         try {
             if (mOnErrorMap != null) {
                 LiveDataUtils.update(this, mOnErrorMap.apply(error));
@@ -72,21 +83,12 @@ public class RxLiveData<IN, OUT> extends MutableLiveData<OUT> implements Disposa
             // 打印 error 日志
             Log.e(TAG, "onError: " + error);
         } catch (Throwable throwable) {
-            Log.e(TAG, "onError: " + throwable);
+            Log.e(TAG, "onError error: " + throwable);
         }
     }
 
     @Override
     public void onComplete() { }
-
-    /**
-     * @param onNextMap onNext 的回调处理，为空时不执行
-     * @param onErrorMap onError 的回调处理，为空时不执行
-     */
-    private RxLiveData(@Nullable Function<IN, OUT> onNextMap, @Nullable Function<Throwable, OUT> onErrorMap) {
-        mOnNextMap = onNextMap;
-        mOnErrorMap = onErrorMap;
-    }
 
     /**
      * 关闭订阅并清空数据
@@ -100,11 +102,9 @@ public class RxLiveData<IN, OUT> extends MutableLiveData<OUT> implements Disposa
      * 关闭之前的订阅，并设置新的 Disposable
      */
     private void disposeAndSet(Disposable d) {
-        synchronized (mDisposableLock) {
-            if (!isDisposed()) {
-                mDisposable.dispose();
-            }
-            mDisposable = d;
+        Disposable old = mDisposableRef.getAndSet(d);
+        if (old != null && !old.isDisposed()) {
+            old.dispose();
         }
     }
 
@@ -118,9 +118,7 @@ public class RxLiveData<IN, OUT> extends MutableLiveData<OUT> implements Disposa
 
     @Override
     public boolean isDisposed() {
-        synchronized (mDisposableLock) {
-            return mDisposable == null || mDisposable.isDisposed();
-        }
+        return mDisposableRef.get() == null;
     }
 
     /**
@@ -138,10 +136,44 @@ public class RxLiveData<IN, OUT> extends MutableLiveData<OUT> implements Disposa
     }
 
     /**
-     * 构造简单的 RxLiveData，输入是 T，输出都是 StateData，失败时构造一个 StateData.error()
+     * 构造简单的 RxLiveData，输入和输出都是 StateData，失败时构造一个 StateData.error()
      */
-    public static <T> RxLiveData<T, StateData<T>> simpleStateData() {
+    public static <T> RxLiveData<StateData<T>, StateData<T>> simpleStateData() {
+        return new RxLiveData<>(success -> success, StateData::error);
+    }
+
+    /**
+     * 构造简单的 RxLiveData，输入是 T， 输出是 StateData，失败时构造一个 StateData.error()
+     */
+    public static <T> RxLiveData<T, StateData<T>> simpleToStateData() {
         return new RxLiveData<>(StateData::ready, StateData::error);
     }
 
+    /**
+     * 构造 Response 相关的 RxLiveData，输入时 Response<T>，输出是 T，失败为 null
+     */
+    public static <T> RxLiveData<Response<T>, T> response() {
+        return new RxLiveData<>(ResponseUtils::getOrError, error -> null);
+    }
+
+    /**
+     * 构造 Response 相关的 RxLiveData，输入时 Response<IN>，输出是 OUT，失败为 null，中间需要一个 IN 到 OUT 的转换
+     */
+    public static <IN, OUT> RxLiveData<Response<IN>, OUT> response(@NonNull Function<IN, OUT> function) {
+        return new RxLiveData<>(response -> function.apply(ResponseUtils.getOrError(response)), error -> null);
+    }
+
+    /**
+     * 构造 Response 相关的 RxLiveData，输入时 Response<T>，输出是 StateData<T>，失败时构造一个 StateData.error()
+     */
+    public static <T> RxLiveData<Response<T>, StateData<T>> response2StateData() {
+        return new RxLiveData<>(response -> StateData.ready(ResponseUtils.getOrError(response)), StateData::error);
+    }
+
+    /**
+     * 构造 Response 相关的 RxLiveData，输入时 Response<IN>，输出是 StateData<OUT>，中间需要一个 IN 到 OUT 的转换
+     */
+    public static <IN, OUT> RxLiveData<Response<IN>, StateData<OUT>> response2StateData(@NonNull Function<IN, OUT> function) {
+        return new RxLiveData<>(response -> StateData.ready(function.apply(ResponseUtils.getOrError(response))), StateData::error);
+    }
 }

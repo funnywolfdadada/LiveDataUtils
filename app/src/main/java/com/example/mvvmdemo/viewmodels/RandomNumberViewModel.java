@@ -1,8 +1,9 @@
 package com.example.mvvmdemo.viewmodels;
 
 import com.example.mvvmdemo.repositories.RandomNumberRepository;
-import com.example.mvvmdemo.repositories.StateData;
-import com.example.mvvmdemo.utils.LiveDataUtils;
+import com.funnywolf.livedatautils.LiveDataUtils;
+import com.funnywolf.livedatautils.StateData;
+
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;

@@ -1,4 +1,4 @@
-package com.example.mvvmdemo.utils;
+package com.funnywolf.livedatautils;
 
 import android.os.Handler;
 import android.os.Looper;
