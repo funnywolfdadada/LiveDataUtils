@@ -1,7 +1,27 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release' // 添加bintray插件
+
+// 配置2
+publish {
+    userOrg = 'funnywolf'             // Binary用户名
+    groupId = 'com.funnywolf'        // 依赖名compile 'x:y:z '中的包名x
+    artifactId = 'LiveDataUtils'        // 依赖名compile 'x:y:z '中的项目名y
+    publishVersion = '1.0.0'          // 依赖名compile 'x:y:z '中的版本号z
+    desc = 'Utilities for LiveData.'            // 对该开源组件的说明
+    website = 'https://github.com/funnywolfdadada/MvvmDemo'  // VCS地址，即填写项目上传的Github地址
+}
+
+// 特别注意：保持你的library module的名字同artifactId一样
+// 1. 背景
+// 在Bintray上你的项目的maven-metadata.xml文件的路径=gruopId+"/"+module名称
+// 如你的groupId=scut.carson_ho，artifactId是CircileView，但module名称是circlelibrary
+// 此时，项目文件在scut.carson_ho.CircileView目录下的，但maven-metadata.xml文件却是在scut.carson_ho.circlelibrary目录下的。
+// 2. 冲突：若你有多个项目groupId一样 & artifactId不一样，但module名称都是library的话，maven-metadata.xml文件的地址可能会一样，即都是：gruopId+"/"+module名称，那么就可能产生冲突
+// 3. 解决方案：保持module名称和artifactId一致
 
 android {
     compileSdkVersion 28
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
         minSdkVersion 21
@@ -38,5 +58,5 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
 
     implementation 'io.reactivex.rxjava2:rxjava:2.2.8'
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
 }
