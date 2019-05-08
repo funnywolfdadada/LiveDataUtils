@@ -3,12 +3,13 @@ apply plugin: 'com.novoda.bintray-release' // 添加bintray插件
 
 // 配置2
 publish {
-    userOrg = 'funnywolf'             // Binary用户名
+    userOrg = 'funnywolfdadada'             // Binary用户名
+    repoName = 'AndroidUtilities'
     groupId = 'com.funnywolf'        // 依赖名compile 'x:y:z '中的包名x
     artifactId = 'LiveDataUtils'        // 依赖名compile 'x:y:z '中的项目名y
     publishVersion = '1.0.0'          // 依赖名compile 'x:y:z '中的版本号z
     desc = 'Utilities for LiveData.'            // 对该开源组件的说明
-    website = 'https://github.com/funnywolfdadada/MvvmDemo'  // VCS地址，即填写项目上传的Github地址
+    website = 'https://github.com/funnywolfdadada/LiveDataUtils'  // VCS地址，即填写项目上传的Github地址
 }
 
 // 特别注意：保持你的library module的名字同artifactId一样
