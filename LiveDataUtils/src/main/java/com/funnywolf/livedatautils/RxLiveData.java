@@ -22,7 +22,7 @@ import retrofit2.Response;
  * @author funnywolf
  * @since 2019-04-22
  */
-public class RxLiveData<IN, OUT> extends MutableLiveData<OUT> implements Disposable, Observer<IN> {
+public class RxLiveData<IN, OUT> extends EventMutableLiveData<OUT> implements Disposable, Observer<IN> {
     private static final String TAG = "RxLiveData";
 
     private final AtomicReference<Disposable> mDisposableRef = new AtomicReference<>(null);

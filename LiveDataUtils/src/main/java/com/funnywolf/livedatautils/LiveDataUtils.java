@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 /**
+ * LiveData 相关的工具类，简化 LiveData 操作
+ *
  * @author funnywolf
  * @since 2019-04-22
  */
@@ -39,11 +41,14 @@ public class LiveDataUtils {
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
             mld.setValue(d);
         } else {
-            setValueOnMain(mld, d);
+            postSetValue(mld, d);
         }
     }
 
-    private static <T> void setValueOnMain(MutableLiveData<T> mld, T d) {
+    /**
+     * 向主线程的 handler 抛 SetValueRunnable
+     */
+    public static <T> void postSetValue(MutableLiveData<T> mld, T d) {
         if (sMainHandler == null) {
             sMainHandler = new Handler(Looper.getMainLooper());
         }

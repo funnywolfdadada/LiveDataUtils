@@ -1,8 +1,6 @@
 package com.funnywolf.livedatautils;
 
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -73,32 +71,16 @@ public class LiveDataBus {
     /**
      * 返回事件 T 的 MutableLiveData
      */
-    public <T> MutableLiveData<T> getData(Class<T> eventClass) {
+    public <T> MutableLiveData<T> getLiveData(Class<T> eventClass) {
         if (eventClass == null) {
             return null;
         }
         return getItem(eventClass).mutableLiveData;
     }
 
-    public <T> void observe(Class<T> clazz, LifecycleOwner owner, Observer<T> observer) {
-        if (clazz == null || owner == null || observer == null) { return; }
-        getData(clazz).observe(owner, observer);
-    }
-
-    public <T> void observeForever(Class<T> clazz, Observer<T> observer) {
-        if (clazz == null || observer == null) { return; }
-        getData(clazz).observeForever(observer);
-    }
-
-    public <T> void removeObserver(Class<T> clazz, Observer<T> observer) {
-        if (clazz == null || observer == null) { return; }
-        getData(clazz).removeObserver(observer);
-    }
-
     public <T> void post(Class<T> clazz, T data) {
         if (clazz == null) { return; }
-        // setValue 保证事件不丢失
-        LiveDataUtils.setValue(getData(clazz), data);
+        getLiveData(clazz).postValue(data);
     }
 
     private <T> LiveDataItem<T> getItem(Class<T> eventClass) {
@@ -125,15 +107,16 @@ public class LiveDataBus {
     }
 
     /**
-     * 存储事件类型和 MutableLiveData，为了保证事件 class 的泛型和 MutableLiveData 的泛型一致
+     * 存储事件类型和 EventMutableLiveData
+     * 为了保证事件 class 的泛型和 EventMutableLiveData 的泛型一致
      */
     private static class LiveDataItem<T> {
         private final Class<T> clazz;
-        private final MutableLiveData<T> mutableLiveData;
+        private final EventMutableLiveData<T> mutableLiveData;
 
         LiveDataItem(Class<T> clazz) {
             this.clazz = clazz;
-            mutableLiveData = new MutableLiveData<>();
+            mutableLiveData = new EventMutableLiveData<>();
         }
     }
 }

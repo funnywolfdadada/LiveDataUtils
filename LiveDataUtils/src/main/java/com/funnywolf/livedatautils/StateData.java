@@ -1,7 +1,5 @@
 package com.funnywolf.livedatautils;
 
-import androidx.annotation.NonNull;
-
 /**
  * 带有状态的数据包装类
  *
@@ -25,7 +23,7 @@ public class StateData<T> {
     }
 
     /**
-     * data 最好不要为空，state = STATUS_READY的 StateData
+     * data 最好不要为空，state = STATE_READY 的 StateData
      */
     public static <T> StateData<T> ready(T data) {
         return new StateData<>(data, STATE_READY, null);
@@ -48,14 +46,14 @@ public class StateData<T> {
     /**
      * STATE_ERROR 的 StateData，data 为 null，有额外的 error 信息
      */
-    public static <T> StateData<T> error(@NonNull Throwable e) {
+    public static <T> StateData<T> error(Throwable e) {
         return new StateData<>(null, STATE_ERROR, e);
     }
 
     /**
      * STATE_ERROR 的 StateData，有额外的 error 信息
      */
-    public static <T> StateData<T> error(T data, @NonNull Throwable e) {
+    public static <T> StateData<T> error(T data, Throwable e) {
         return new StateData<>(data, STATE_ERROR, e);
     }
 
