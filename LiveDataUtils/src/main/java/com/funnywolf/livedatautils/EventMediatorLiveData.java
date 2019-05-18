@@ -20,11 +20,6 @@ public class EventMediatorLiveData<T> extends MediatorLiveData<T> {
     }
 
     @Override
-    public void setValue(T value) {
-        LiveDataUtils.setValue(this, value);
-    }
-
-    @Override
     public void postValue(T value) {
         LiveDataUtils.setValue(this, value);
     }

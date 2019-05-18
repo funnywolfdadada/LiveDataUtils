@@ -20,11 +20,6 @@ public class EventMutableLiveData<T> extends MutableLiveData<T> {
     }
 
     @Override
-    public void setValue(T value) {
-        LiveDataUtils.setValue(this, value);
-    }
-
-    @Override
     public void postValue(T value) {
         LiveDataUtils.setValue(this, value);
     }
