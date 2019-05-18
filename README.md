@@ -13,6 +13,6 @@
 gradle 依赖方法：
 ```
 dependencies {
-    implementation 'com.funnywolf:LiveDataUtils:1.0.0'
+    implementation 'com.funnywolf:LiveDataUtils:1.1.0'
 }
 ```
