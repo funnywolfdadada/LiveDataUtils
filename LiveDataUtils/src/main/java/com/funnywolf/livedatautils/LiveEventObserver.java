@@ -14,7 +14,7 @@ import java.util.List;
 
 
 /**
- * LiveData 用作事件总线时的观察者
+ * LiveData 用作事件传递时的观察者
  * 保证所有事件不丢失，保存非激活状态的事件，并能够在激活状态回调，且没有内存泄漏
  *
  * @see AsEventBus
@@ -27,7 +27,7 @@ public class LiveEventObserver<T> implements LifecycleObserver, Observer<T> {
     private LifecycleOwner mOwner;
     private Observer<? super T> mObserver;
 
-    private List<T> mPendingData = new ArrayList<>();
+    private final List<T> mPendingData = new ArrayList<>();
 
     public LiveEventObserver(LiveData<T> liveData, LifecycleOwner owner, Observer<? super T> observer) {
         mLiveData = liveData;
@@ -62,12 +62,17 @@ public class LiveEventObserver<T> implements LifecycleObserver, Observer<T> {
     /**
      * onStart 之后就是激活状态了，如果之前存的有数据，就发送出去
      */
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    private void onStart() {
-        for (int i = 0; i < mPendingData.size(); i++) {
-            mObserver.onChanged(mPendingData.get(i));
+    @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
+    private void onEvent(LifecycleOwner owner, Lifecycle.Event event) {
+        if (owner != mOwner) {
+            return;
         }
-        mPendingData.clear();
+        if (event == Lifecycle.Event.ON_START || event == Lifecycle.Event.ON_RESUME) {
+            for (int i = 0; i < mPendingData.size(); i++) {
+                mObserver.onChanged(mPendingData.get(i));
+            }
+            mPendingData.clear();
+        }
     }
 
     /**
@@ -82,7 +87,6 @@ public class LiveEventObserver<T> implements LifecycleObserver, Observer<T> {
         mOwner = null;
 
         mPendingData.clear();
-        mPendingData = null;
 
         mObserver = null;
     }

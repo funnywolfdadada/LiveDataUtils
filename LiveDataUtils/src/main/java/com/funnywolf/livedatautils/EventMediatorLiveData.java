@@ -6,7 +6,7 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Observer;
 
 /**
- * 用作事件总线的 {@link MediatorLiveData}
+ * 用作事件传递的 {@link MediatorLiveData}
  *
  * @see AsEventBus
  *

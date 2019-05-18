@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 /**
- * 用作事件总线的 {@link MutableLiveData}
+ * 用作事件传递的 {@link MutableLiveData}
  *
  * @see AsEventBus
  *

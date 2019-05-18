@@ -40,7 +40,7 @@ public class RxLiveData<IN, OUT> extends EventMutableLiveData<OUT> implements Di
      * @param onNextMap onNext 的回调处理，为空时不执行
      * @param onErrorMap onError 的回调处理，为空时不执行
      */
-    private RxLiveData(@Nullable Function<IN, OUT> onNextMap, @Nullable Function<Throwable, OUT> onErrorMap) {
+    public RxLiveData(@Nullable Function<IN, OUT> onNextMap, @Nullable Function<Throwable, OUT> onErrorMap) {
         super();
         mOnNextMap = onNextMap;
         mOnErrorMap = onErrorMap;
@@ -51,7 +51,7 @@ public class RxLiveData<IN, OUT> extends EventMutableLiveData<OUT> implements Di
      */
     @Override
     public void onSubscribe(Disposable d) {
-        disposeAndSet(d);
+        mDisposableRef.set(d);
     }
 
     /**
@@ -99,21 +99,14 @@ public class RxLiveData<IN, OUT> extends EventMutableLiveData<OUT> implements Di
     }
 
     /**
-     * 关闭之前的订阅，并设置新的 Disposable
-     */
-    private void disposeAndSet(Disposable d) {
-        Disposable old = mDisposableRef.getAndSet(d);
-        if (old != null && !old.isDisposed()) {
-            old.dispose();
-        }
-    }
-
-    /**
      * 关闭之前的订阅并置为空
      */
     @Override
     public void dispose() {
-        disposeAndSet(null);
+        Disposable old = mDisposableRef.getAndSet(null);
+        if (old != null && !old.isDisposed()) {
+            old.dispose();
+        }
     }
 
     @Override
