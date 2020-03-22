@@ -1,4 +1,6 @@
 # LiveDataUtils
+**Deprecated**：之后小工具更新都转移到 [HollowKit](https://github.com/funnywolfdadada/HollowKit)  
+
 自己常用的一些 `LiveData` 的工具类，目前包括：
  - `AsEventBus`，标识 `LiveData` 用作事件总线
  - `EventMediatorLiveData`，用于事件总线的 `MediatorLiveData`，能够保证事件不丢失
